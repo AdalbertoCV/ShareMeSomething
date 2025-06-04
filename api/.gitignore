@@ -31,9 +31,12 @@ ENV/
 env/
 .venv/
 
-# Migrations (opcional, si prefieres ignorarlas hasta producción)
+# Ignorar todo en migrations excepto __init__.py
+**/migrations/*
+!**/migrations/__init__.py
+
+# Adicionalmente, ignora bytecode y caché
 **/migrations/__pycache__/
 **/migrations/*.pyc
 **/migrations/*.pyo
 **/migrations/*.pyd
-**/migrations/*.sqlite3
