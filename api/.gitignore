@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+*.sqlite3
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# macOS
+.DS_Store
+
+# Python virtual environments (aunque no usas uno local, es común ignorarlo)
+venv/
+ENV/
+env/
+.venv/
+
+# Migrations (opcional, si prefieres ignorarlas hasta producción)
+**/migrations/__pycache__/
+**/migrations/*.pyc
+**/migrations/*.pyo
+**/migrations/*.pyd
+**/migrations/*.sqlite3
