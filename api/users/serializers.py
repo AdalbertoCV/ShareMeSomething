@@ -58,3 +58,12 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
         usuario.set_password(password)
         usuario.save()
         return usuario
+    
+
+class UsuarioUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializador para editar los campos de un usuario
+    """
+    class Meta:
+        model = Usuario
+        fields = ["first_name", "last_name", "foto_perfil", "descripcion", "pasatiempos"]
