@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, permissions
+from rest_framework import status
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Usuario
 from .serializers import UsuarioSerializer, UsuarioCreateSerializer, UsuarioUpdateSerializer
 from django.shortcuts import get_object_or_404
@@ -12,6 +13,14 @@ class UsuarioApiView(APIView):
 
     allowed methods: get, post, put, delete.
     """
+
+    def get_permissions(self):
+        """
+        Asigna permisos dinámicamente según el método HTTP.
+        """
+        if self.request.method == 'POST':
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
     def get(self, request, id=None):
         """
@@ -71,6 +80,10 @@ class UsuarioApiView(APIView):
         if request.user != usuario:
             return Response({"detail": "No tienes permiso para eliminar esta cuenta."}, status=status.HTTP_403_FORBIDDEN)
 
+        # Eliminar la imagen de perfil si existe
+        if usuario.foto_perfil:
+            usuario.foto_perfil.delete(save=False) 
+
         usuario.delete()
         return Response({"detail": "Tu cuenta ha sido eliminada correctamente."}, status=status.HTTP_204_NO_CONTENT)
 
@@ -78,7 +91,7 @@ class LogoutView(APIView):
     """
     Cierra la sesión del usuario invalidando el refresh token.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
