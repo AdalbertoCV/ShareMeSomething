@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from users.models import Usuario
-from utils.utils import validar_contraseña_segura
+from utils.utils import validar_contraseña_segura, validar_formato_foto
 
 class UsuarioSerializer(serializers.ModelSerializer):
     """
@@ -59,6 +59,10 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
         usuario.save()
         return usuario
     
+    def validate_foto_perfil(self, value):
+        validar_formato_foto(value)
+        return value
+    
 
 class UsuarioUpdateSerializer(serializers.ModelSerializer):
     """
@@ -67,3 +71,7 @@ class UsuarioUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
         fields = ["first_name", "last_name", "foto_perfil", "descripcion", "pasatiempos"]
+
+    def validate_foto_perfil(self, value):
+        validar_formato_foto(value)
+        return value

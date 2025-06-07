@@ -1,3 +1,4 @@
 Django>=4.2,<5.0
 djangorestframework
 Pillow
+djangorestframework-simplejwt>=5.3.1

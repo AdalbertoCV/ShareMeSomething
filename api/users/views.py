@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, permissions
 from .models import Usuario
 from .serializers import UsuarioSerializer, UsuarioCreateSerializer, UsuarioUpdateSerializer
 from django.shortcuts import get_object_or_404
+from rest_framework_simplejwt.tokens import RefreshToken
 
 class UsuarioApiView(APIView):
     """
@@ -47,8 +48,9 @@ class UsuarioApiView(APIView):
         
         usuario = get_object_or_404(Usuario, id = id, is_staff = False)
 
-        #if request.user != usuario:
-        #    return Response({"detail": "No tienes permiso para realizar esta acción."}, status=status.HTTP_403_FORBIDDEN)
+        if request.user != usuario:
+        
+            return Response({"detail": "No tienes permiso para realizar esta acción."}, status=status.HTTP_403_FORBIDDEN)
         
         serializer = UsuarioUpdateSerializer(usuario, data=request.data, partial=True)
         if serializer.is_valid():
@@ -66,8 +68,23 @@ class UsuarioApiView(APIView):
 
         usuario = get_object_or_404(Usuario, id=id, is_staff=False)
 
-        #if request.user != usuario:
-        #    return Response({"detail": "No tienes permiso para eliminar esta cuenta."}, status=status.HTTP_403_FORBIDDEN)
+        if request.user != usuario:
+            return Response({"detail": "No tienes permiso para eliminar esta cuenta."}, status=status.HTTP_403_FORBIDDEN)
 
         usuario.delete()
         return Response({"detail": "Tu cuenta ha sido eliminada correctamente."}, status=status.HTTP_204_NO_CONTENT)
+
+class LogoutView(APIView):
+    """
+    Cierra la sesión del usuario invalidando el refresh token.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response({"detail": "Sesión cerrada correctamente."}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

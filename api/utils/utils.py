@@ -31,3 +31,13 @@ def validar_contraseña_segura(value):
         raise ValidationError("La contraseña debe contener al menos un número.")
     if not re.search(r"[^\w\s]", value):
         raise ValidationError("La contraseña debe contener al menos un carácter especial.")
+    
+def validar_formato_foto(foto):
+    """
+    Valida que el formato de la fotografía subida sea unicamente o .jpg o .png
+    """
+    ext_permitidas = ['.jpeg','.jpg','.png']
+    ext = os.path.splitext(foto.name)[1].lower()
+
+    if ext not in ext_permitidas:
+        raise ValueError("Solo se permiten imagenes en formato .jpg o .png")
