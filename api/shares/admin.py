@@ -1,3 +1,5 @@
 from django.contrib import admin
+from shares.models import Share, FotoShare
 
-# Register your models here.
+admin.site.register(Share)
+admin.site.register(FotoShare)

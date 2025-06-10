@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from shares.models import Share, FotoShare
-from shares.serializers import ShareSerializer, ShareSerializer, ShareUpdateSerializer
+from shares.serializers import ShareSerializer, ShareSerializer
 from users.models import Usuario
 from datetime import datetime
 
