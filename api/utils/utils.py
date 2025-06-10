@@ -11,6 +11,18 @@ def generar_nombre_imagen(instance, filename):
     nuevo_nombre = f"{uuid.uuid4().hex}{extension}"
     return os.path.join('usuarios', 'fotos', nuevo_nombre)
 
+def generar_nombre_imagen_share(instance, filename):
+    """
+    Genera un nombre de archivo único para una imagen de un Share.
+    Se organiza por carpeta del remitente: shares/fotos/<username>/<uuid>.<ext>
+    """
+    extension = os.path.splitext(filename)[1]
+    nuevo_nombre = f"{uuid.uuid4().hex}{extension}"
+
+    remitente_username = instance.share.remitente.username if instance.share and instance.share.remitente else 'sin_usuario'
+    
+    return os.path.join('shares', 'fotos', remitente_username, nuevo_nombre)
+
 
 def validar_contraseña_segura(value):
     """
