@@ -2,11 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from shares.models import Share, FotoShare
-from shares.serializers import ShareSerializer, ShareSerializer
-from users.models import Usuario
+from shares.models import Share
+from shares.serializers import ShareSerializer, ShareCreateSerializer
 from datetime import datetime
 
 class ShareApiView(APIView):
@@ -24,7 +21,7 @@ class ShareApiView(APIView):
 
         filtros: fecha.
         """
-        tipo = request.query_params.get('tipo')  
+        tipo = request.query_params.get('tipo', 'recibidos')
         fecha = request.query_params.get('fecha')  # YYYY-MM-DD 
         usuario_id = request.query_params.get('usuario_id')  
 
@@ -49,3 +46,15 @@ class ShareApiView(APIView):
 
         serializer = ShareSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
+    
+    def post(self, request):
+        """
+        Método post para crear un nuevo share.
+        """
+        serializer = ShareCreateSerializer(data = request.data, context = {'request':request})
+        if serializer.is_valid():
+            share = serializer.save()
+            serializer_response = ShareSerializer(share, context={'request':request})
+            return Response(serializer_response.data, status = status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)

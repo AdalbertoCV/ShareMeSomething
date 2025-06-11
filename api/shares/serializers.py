@@ -26,3 +26,37 @@ class ShareSerializer(serializers.ModelSerializer):
     class Meta:
         model = Share
         fields = [ 'id','titulo','descripcion','categoria','fecha_creacion','remitente','destinatario','fotos']
+
+
+class ShareCreateSerializer(serializers.ModelSerializer):
+    """
+    Serializador para la creación de un nuevo share.
+    """
+
+    fotos = serializers.ListField(
+        child=serializers.ImageField(),
+        write_only=True,
+        required=False
+    )
+    destinatario = serializers.PrimaryKeyRelatedField(queryset=Usuario.objects.all())
+
+    class Meta:
+        model = Share
+        fields = ['titulo','descripcion','categoria','destinatario','fotos']
+
+    def create(self,validated_data):
+        """
+        Método para manejar la creación del share.
+        """
+        request = self.context.get('request')
+        remitente = request.user  
+
+        fotos_data = validated_data.pop('fotos', [])
+        destinatario = validated_data.pop('destinatario')
+
+        share = Share.objects.create(remitente=remitente, destinatario=destinatario, **validated_data)
+
+        for foto in fotos_data:
+            FotoShare.objects.create(share=share, imagen=foto)
+
+        return share
