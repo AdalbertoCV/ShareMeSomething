@@ -60,3 +60,53 @@ class ShareCreateSerializer(serializers.ModelSerializer):
             FotoShare.objects.create(share=share, imagen=foto)
 
         return share
+    
+class ShareUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializador para actualizar los datos de un share
+    """
+
+    fotos = serializers.ListField(
+        child=serializers.ImageField(),
+        write_only=True,
+        required=False
+    )
+    fotos_eliminar = serializers.ListField(
+        child=serializers.IntegerField(),
+        write_only=True,
+        required=False
+    )
+
+    class Meta:
+        model = Share
+        fields = ['titulo','descripcion','categoria','fotos', 'fotos_eliminar']
+        extra_kwargs = {
+            'titulo': {'required': False},
+            'descripcion': {'required': False},
+            'categoria': {'required': False},
+        }
+
+    def update(self, instance, validated_data):
+        """
+        Método para manejar la actualización de los campos del modelo, incluyendo la agregación o eliminación de fotos.
+        """
+
+        instance.titulo = validated_data.get('titulo', instance.titulo)
+        instance.descripcion = validated_data.get('descripcion', instance.descripcion)
+        instance.categoria = validated_data.get('categoria', instance.categoria)
+        instance.save()
+
+        # si se enviaron nuevas fotos, las creamos.
+        fotos_nuevas = validated_data.get('fotos', [])
+        for foto in fotos_nuevas:
+            FotoShare.objects.create(share=instance, imagen=foto)
+
+        # si se envian fotos a eliminar, manejamos la elimianción.
+        fotos_eliminar_ids = validated_data.get('fotos_eliminar', [])
+        if fotos_eliminar_ids:
+            fotos_a_eliminar = FotoShare.objects.filter(id__in=fotos_eliminar_ids, share=instance)
+            for foto in fotos_a_eliminar:
+                foto.imagen.delete(save=False)  # Borramos el archivo físico
+                foto.delete()  # Borramos la instancia en la base de datos
+
+        return instance
