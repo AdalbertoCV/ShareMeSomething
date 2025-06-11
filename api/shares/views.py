@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
-from shares.models import Share
+from shares.models import Share, FotoShare
 from shares.serializers import ShareSerializer, ShareCreateSerializer, ShareUpdateSerializer
 from datetime import datetime
 
@@ -86,3 +86,22 @@ class ShareApiView(APIView):
                 return Response({'detail':'No tienes permisos para realizar esta acción.'},status = status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'detail':'El id del Share es requerido para su actualización'},status = status.HTTP_400_BAD_REQUEST)   
+        
+
+    def delete(self, request, id=None):
+        """
+        Método delete para elminar un share por id
+        """
+        if id:
+            share = get_object_or_404(Share, id = id)
+            if share.remitente == request.user:
+                fotos = FotoShare.objects.filter(share = share)
+                for foto in fotos:
+                    foto.imagen.delete(save=False)
+                    foto.delete()
+                share.delete()
+                return Response({'detail':'Share eliminado correctamente'}, status = status.HTTP_200_OK)
+            else:
+                return Response({'detail':'No tienes permisos para realizar esta acción.'},status = status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail':'El id del Share es requerido para eliminarlo'},status = status.HTTP_400_BAD_REQUEST) 
