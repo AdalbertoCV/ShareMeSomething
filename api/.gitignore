@@ -34,9 +34,10 @@ ENV/
 env/
 .venv/
 
-# Ignorar todo en migrations excepto __init__.py
+# Ignorar todo en migrations excepto __init__.py y las initial
 **/migrations/*
 !**/migrations/__init__.py
+!**/migrations/*initial*.py
 
 # Adicionalmente, ignora bytecode y caché
 **/migrations/__pycache__/

@@ -2,10 +2,22 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from shares.models import Share, FotoShare
 from shares.serializers import ShareSerializer, ShareCreateSerializer, ShareUpdateSerializer
 from datetime import datetime
+from shares.models import CATEGORIA_CHOICES
+
+class TipoShareApiView(APIView):
+    """
+    Api view para devolver todos los tipos disponibles de shares al frontend
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response(dict(CATEGORIA_CHOICES), status= status.HTTP_200_OK)
+
 
 class ShareApiView(APIView):
     """
