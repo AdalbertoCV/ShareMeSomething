@@ -6,6 +6,8 @@ from .models import Usuario
 from .serializers import UsuarioSerializer, UsuarioCreateSerializer, UsuarioUpdateSerializer
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView      
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer    
 
 class UsuarioApiView(APIView):
     """
@@ -87,6 +89,24 @@ class UsuarioApiView(APIView):
         usuario.delete()
         return Response({"detail": "Tu cuenta ha sido eliminada correctamente."}, status=status.HTTP_204_NO_CONTENT)
 
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = TokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            # Devuelve 400 en lugar de 401 si hay un error de autenticación
+            return Response(
+                {"detail": "Credenciales inválidas"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+    
 class LogoutView(APIView):
     """
     Cierra la sesión del usuario invalidando el refresh token.
