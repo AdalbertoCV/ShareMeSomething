@@ -18,6 +18,9 @@ staticfiles/
 # VS Code
 .vscode/
 
+# DevContainer
+.devcontainer/
+
 # Docker
 *.pid
 docker-compose.override.yml
